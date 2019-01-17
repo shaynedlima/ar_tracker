@@ -17,8 +17,6 @@ from visualization_msgs.msg import MarkerArray
 marker_xOffset = 0.05 #cm
 
 def callback(data):
-    #print data.markers[0]
-    #print "Orientation: " + str(data.markers[0].pose.pose.orientation)
     markers = data.markers
 
     tempPoint = []
@@ -105,61 +103,6 @@ def callback(data):
         print "Goal Regions length= " + str(len(goalRegions.markers))
         print goalRegions
         publisher.publish(goalRegions)
-
-        # Position of point relative to base_link
-        #x_base = 1
-        #y_base = 1
-        #z_base = 0
-        #print "p1"
-        #print p1
-    
-    #istener.transformPose(p, "/ar_marker_0")
-    #print p
-    #t = tf.Transformer(True, rospy.Duration(10.0))
-    #m = robot_msgs.msg.TransformStamped()
-    #m.header.frame_id = "ar_marker_frame"
-    #m.parent_id = "PARENT"
-
-    #m = tf.transformPose(marker.pose)
-    
-
-
-
-    #transform = self.tf_buffer.lookup_transform("robot_center", "base_front_laser_link_horizontal",
-                                                #rospy.Time(0),
-                                                #rospy.Duration(10))
-
-    
-    #print tf_listener.frameExists("ar_marker_0")
-
-    
-    # A point relative to the camera frame
-    #try:
-    #print "tried"
-
-
-    #testPoint2 = geometry_msgs.msg.PoseStamped()
-    #testPoint2.header.frame_id = "camera_link"
-    #testPoint2.header.stamp = rospy.Time(0)
-    #testPoint2.pose.position.x = 0.0
-    #testPoint2.pose.position.y = 0.0
-    #testPoint2.pose.position.z = 0.0
-
-    #testPoint2.pose.orientation.x = 0.0
-    #testPoint2.pose.orientation.y = 0.0
-    #testPoint2.pose.orientation.z = 0.0
-    #testPoint2.pose.orientation.w = 0.0
-
-    #p2 = tf_listener.transformPose("ar_marker_0",testPoint2)
-
-    # To translate to base_link frame subtract known constant to x-value of point
-
-        
-    #print p2
-
-    
-
-
 
     
 def listener():
