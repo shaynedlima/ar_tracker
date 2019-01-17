@@ -26,7 +26,10 @@ def callback(data):
     goalRegions.markers = []
 
     tf_listener = tf.TransformListener()
+    t = rospy.Time.now()
+    #tf_listener.waitForTransform("/camera_link", "/ar_marker_2", t, rospy.Duration(5.0))
     time.sleep(5)
+   
 
 
     if(len(markers) == 3):
@@ -43,11 +46,10 @@ def callback(data):
        
         points = [p1, p2]
 
-        trans = []
-        rot = []
+        #trans = []
+        #rot = []
         
     
-
         for i in range(0,2):
             #tempPoint.append(geometry_msgs.msg.PointStamped())
             tempPoint.append(geometry_msgs.msg.PoseStamped())
@@ -66,14 +68,14 @@ def callback(data):
 
             # Finding goal region locations relative to calibration marker
             tempPoint[i] = tf_listener.transformPose("ar_marker_2",tempPoint[i])
-            #tempPoint[i].point.x = tempPoint[i].point.x - marker_xOffset
+            tempPoint[i].pose.position.x = tempPoint[i].pose.position.x - marker_xOffset
             
 
             # Goal region markers
             goal = Marker()
-            goal.header.frame_id = "/ar_marker_2"
+            #goal.header.frame_id = "/ar_marker_2"
             goal.header.stamp = rospy.Time()
-            #goal.header.frame_id = "/base_link"
+            goal.header.frame_id = "/base_link"
             goal.type = Marker.CYLINDER
             goal.action = Marker.ADD
             goal.id = i
@@ -100,8 +102,8 @@ def callback(data):
 
             goalRegions.markers.append(goal)
     
-        print "Goal Regions length= " + str(len(goalRegions.markers))
-        print goalRegions
+        #print "Goal Regions length= " + str(len(goalRegions.markers))
+        #print goalRegions
         publisher.publish(goalRegions)
 
     
