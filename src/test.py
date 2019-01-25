@@ -12,99 +12,66 @@ import tf
 import time
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
+import statistics
 
 # GLOBAL VARIABLES
 marker_xOffset = 0.05 #cm
 
 def callback(data):
     markers = data.markers
-
-    tempPoint = []
-    
-
-    goalRegions = MarkerArray()
-    goalRegions.markers = []
-
+    print "testing"
     tf_listener = tf.TransformListener()
     t = rospy.Time.now()
     #tf_listener.waitForTransform("/camera_link", "/ar_marker_2", t, rospy.Duration(5.0))
     time.sleep(5)
-   
+    
 
+    x = []
+    y = []
+    z = []
 
-    if(len(markers) == 3):
-        for i in range(0,3):
-            if(markers[i].id == 0):
-                # Red marker
-                p1 = markers[i] 
-            if(markers[i].id == 1):
-                # Blue marker
-                p2 = markers[i]
-            #if(markers[i].id == 2):
-                # Calibration marker near base
-                #calibrationMarker = markers[i]
-       
-        points = [p1, p2]
+    q0 = []
+    q1 = []
+    q2 = []
+    q3 = []
 
-        #trans = []
-        #rot = []
+    #if(len(markers) == 1 and markers[0].id==2):
+       #t = tf_listener.getLatestCommonTime("/base_link", "/map")
+    for i in range(0,100):
+        (translation,rotation) = tf_listener.lookupTransform("/camera_link", "/ar_marker_2", rospy.Time(0))
+
+        x.append(translation[0])
+        y.append(translation[1])
+        z.append(translation[2])
         
-    
-        for i in range(0,2):
-            #tempPoint.append(geometry_msgs.msg.PointStamped())
-            tempPoint.append(geometry_msgs.msg.PoseStamped())
+        q0.append(rotation[0])
+        q1.append(rotation[1])
+        q2.append(rotation[2])
+        q3.append(rotation[3])
 
-            tempPoint[i].header.frame_id = "camera_link"
-            #tempPoint[i].header.stamp = rospy.Time(0)
-            tempPoint[i].pose.position.x = points[i].pose.pose.position.x
-            tempPoint[i].pose.position.y = points[i].pose.pose.position.y
-            tempPoint[i].pose.position.z = points[i].pose.pose.position.z
+    x = statistics.median(x)
+    y = statistics.median(y)
+    z = statistics.median(z)
+    q0 = statistics.median(q0)
+    q1 = statistics.median(q1)
+    q2 = statistics.median(q2)
+    q3 = statistics.median(q3)
 
-            tempPoint[i].pose.orientation.x = points[i].pose.pose.orientation.x
-            tempPoint[i].pose.orientation.y = points[i].pose.pose.orientation.y
-            tempPoint[i].pose.orientation.z = points[i].pose.pose.orientation.z
-            tempPoint[i].pose.orientation.w = points[i].pose.pose.orientation.w
+    euler = tf.transformations.euler_from_quaternion([q0,q1,q2,q3])
+    roll = euler[0]
+    pitch = euler[1]
+    yaw = euler[2]
 
+    print "Calibration Values:"
+    print "x: " + str(x)
+    print "y: " + str(y)
+    print "z: " + str(z)
 
-            # Finding goal region locations relative to calibration marker
-            tempPoint[i] = tf_listener.transformPose("ar_marker_2",tempPoint[i])
-            tempPoint[i].pose.position.x = tempPoint[i].pose.position.x - marker_xOffset
-            
+    print "Roll: " + str(roll)
+    print "Pitch: " + str(pitch)
+    print "Yaw: " + str(yaw)
 
-            # Goal region markers
-            goal = Marker()
-            #goal.header.frame_id = "/ar_marker_2"
-            goal.header.stamp = rospy.Time()
-            goal.header.frame_id = "/base_link"
-            goal.type = Marker.CYLINDER
-            goal.action = Marker.ADD
-            goal.id = i
-            goal.pose.position.x = tempPoint[i].pose.position.x
-            goal.pose.position.y = tempPoint[i].pose.position.y
-            goal.pose.position.z = tempPoint[i].pose.position.z
-            goal.scale.x = 0.3
-            goal.scale.y = 0.3
-            goal.scale.z = 0.005
-            goal.color.a = 1.0
-            goal.color.g = 0.0
-
-
-            goal.pose.orientation.w = 1.0
-
-            if(points[i].id == 0): #Red
-                print "RED"
-                goal.color.r = 1.0
-                goal.color.b = 0.0
-            if(points[i].id == 1): #Blue
-                print "BLUE"
-                goal.color.b = 1.0
-                goal.color.r = 0.0
-
-            goalRegions.markers.append(goal)
-    
-        #print "Goal Regions length= " + str(len(goalRegions.markers))
-        #print goalRegions
-        publisher.publish(goalRegions)
+        
 
     
 def listener():
