@@ -15,16 +15,17 @@ from visualization_msgs.msg import MarkerArray
 import statistics
 
 # GLOBAL VARIABLES
-marker_xOffset = 0.05 #cm
+marker_xOffset =  -0.305#m
+marker_yOffset = -0.005 #m
+marker_zOffset = -0.015 #m
 
 def callback(data):
     markers = data.markers
-    print "testing"
     tf_listener = tf.TransformListener()
     t = rospy.Time.now()
     #tf_listener.waitForTransform("/camera_link", "/ar_marker_2", t, rospy.Duration(5.0))
     time.sleep(5)
-    
+
 
     x = []
     y = []
@@ -38,12 +39,12 @@ def callback(data):
     #if(len(markers) == 1 and markers[0].id==2):
        #t = tf_listener.getLatestCommonTime("/base_link", "/map")
     for i in range(0,100):
-        (translation,rotation) = tf_listener.lookupTransform("/camera_link", "/ar_marker_2", rospy.Time(0))
+        (translation,rotation) = tf_listener.lookupTransform("/ar_marker_2", "/kinect2_rgb_optical_frame", rospy.Time(0))
 
         x.append(translation[0])
         y.append(translation[1])
         z.append(translation[2])
-        
+
         q0.append(rotation[0])
         q1.append(rotation[1])
         q2.append(rotation[2])
@@ -63,28 +64,25 @@ def callback(data):
     yaw = euler[2]
 
     print "Calibration Values:"
-    print "x: " + str(x)
-    print "y: " + str(y)
-    print "z: " + str(z)
+    print "x: " + str(x + marker_xOffset)
+    print "y: " + str(y + marker_yOffset)
+    print "z: " + str(z + marker_zOffset)
 
     print "Roll: " + str(roll)
     print "Pitch: " + str(pitch)
     print "Yaw: " + str(yaw)
 
-        
 
-    
+
+
 def listener():
     rospy.init_node('listener', anonymous=True)
-    
+
     rospy.Subscriber("ar_pose_marker", AlvarMarkers, callback)
-    
+
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
 if __name__ == '__main__':
     publisher = rospy.Publisher("goalRegions", MarkerArray, queue_size=1)
     listener()
-
-
-
