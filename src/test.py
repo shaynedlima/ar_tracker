@@ -15,8 +15,8 @@ from visualization_msgs.msg import MarkerArray
 import statistics
 
 # GLOBAL VARIABLES
-marker_xOffset =  -0.305#m
-marker_yOffset = -0.005 #m
+marker_xOffset =  -0.805#m -0.305
+marker_yOffset = -0.005 #0.035 #m #-0.005
 marker_zOffset = -0.015 #m
 
 def callback(data):
@@ -38,7 +38,7 @@ def callback(data):
 
     #if(len(markers) == 1 and markers[0].id==2):
        #t = tf_listener.getLatestCommonTime("/base_link", "/map")
-    for i in range(0,100):
+    for i in range(0,200):
         (translation,rotation) = tf_listener.lookupTransform("/ar_marker_2", "/kinect2_rgb_optical_frame", rospy.Time(0))
 
         x.append(translation[0])
@@ -64,14 +64,13 @@ def callback(data):
     yaw = euler[2]
 
     print "Calibration Values:"
-    print "x: " + str(x + marker_xOffset)
-    print "y: " + str(y + marker_yOffset)
-    print "z: " + str(z + marker_zOffset)
+    print "<arg name=\"x_cal\" value=\"" + str(x + marker_xOffset) + "\"/>"
+    print "<arg name=\"y_cal\" value=\"" + str(y + marker_yOffset) + "\"/>"
+    print "<arg name=\"z_cal\" value=\"" + str(z + marker_zOffset) + "\"/>"
 
-    print "Roll: " + str(roll)
-    print "Pitch: " + str(pitch)
-    print "Yaw: " + str(yaw)
-
+    print "<arg name=\"r_cal\" value=\"" + str(roll) + "\"/>"
+    print "<arg name=\"p_cal\" value=\"" + str(pitch) + "\"/>"
+    print "<arg name=\"yaw_cal\" value=\"" + str(yaw) + "\"/>"
 
 
 
